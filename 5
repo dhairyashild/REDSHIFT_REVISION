@@ -1,0 +1,166 @@
+Redshift Complete Training Course [Part 5] | Redshift Architecture |
+------------------------------------------------------------------------------------------
+
+
+
+
+# 📘 REDSHIFT – DISTRIBUTED SYSTEMS, SKEW & PERFORMANCE (COMPLETE NOTES)
+
+---
+
+## 1. REDSHIFT ARCHITECTURE – RECAP
+
+- **MPP (Massively Parallel Processing)** = multiple nodes working together.
+- **SMP (Symmetric Multiprocessing)** = single node system.
+- Redshift uses **MPP architecture** (distributed system).
+
+---
+
+## 2. LEADER NODE
+
+- Acts as a **coordinator**.
+- Receives queries from **clients**.
+- Stores **metadata** (tables, views, users, permissions).
+- **Checks**:
+  - Syntactical errors.
+  - Object existence.
+  - User existence.
+  - User access rights.
+- Develops **execution plan**.
+- Distributes data to **compute nodes** (actually to **slices**).
+- Aggregates results from all compute nodes.
+- **Free** (no cost).
+
+---
+
+## 3. COMPUTE NODE
+
+- Stores actual data.
+- Executes query segments in parallel.
+- Each node has:
+  - CPU
+  - Memory (RAM)
+  - Disk storage
+- Data is **distributed** across compute nodes.
+
+---
+
+## 4. SLICES
+
+- Each compute node is divided into **slices**.
+- Slice = **processing unit** within a node.
+- Number of slices depends on **node type**:
+  - DC2 → 2 slices.
+  - R3 XL → 4 slices.
+  - R3 16x → 16 slices.
+- Slices store data and process queries in parallel.
+- Slices use node’s resources (CPU, memory, disk).
+
+---
+
+## 5. DATA DISTRIBUTION – WHY IMPORTANT
+
+- Data is distributed to **slices**, not directly to compute nodes.
+- If data is **evenly distributed** → performance is high.
+- If data is **unevenly distributed** → **SKEW** → performance drops.
+
+---
+
+## 6. SKEW – DEFINITION
+
+- **Skew** = uneven distribution of data across slices.
+- High skew = poor performance (bottleneck).
+- Acceptable skew ≤ 4%.
+- Skew occurs when some slices have much more data than others.
+
+---
+
+## 7. SKEW – EXAMPLE
+
+| Scenario | Distribution | Time to Process |
+|----------|--------------|-----------------|
+| SMP (1 node) | 100 records | 100 seconds |
+| MPP (even) | 12–13 per slice | 13 seconds |
+| MPP (skewed) | 75 + 5 + 5 + 3 + 3 + 2 + 2 + 5 | 75 seconds |
+
+**Conclusion:** Even distribution = fast. Skew = slow.
+
+---
+
+## 8. SKEW – MOVIE THEATER ANALOGY
+
+- 10 doors in a theater.
+- If all people exit from 1 door → slow.
+- If people exit from all 10 doors → fast.
+- Same for slices: use all slices → fast; one slice overloaded → slow.
+
+---
+
+## 9. HOW TO AVOID SKEW
+
+- Choose correct **distribution key**.
+- Distribute data **evenly** across all slices.
+- Use **EVEN distribution** for small/medium tables.
+- Use **KEY distribution** for large tables joined frequently.
+- Use **ALL distribution** for small lookup tables.
+- Monitor skew using system tables.
+
+---
+
+## 10. QUERY PROCESSING IN REDSHIFT – STEP-BY-STEP
+
+1. **User runs query** (via JDBC/ODBC).
+2. **Leader Node receives query**.
+3. **Parser** checks:
+   - Syntax.
+   - Object existence.
+   - User existence.
+   - Access rights.
+4. **Optimizer**:
+   - Uses **statistics** (table size, unique rows, nulls, duplicates).
+   - Creates **best execution plan**.
+   - Splits query into **segments**.
+5. **Compute Nodes** (slices) execute segments in parallel.
+6. Results sent back to **Leader Node**.
+7. **Leader Node aggregates** results.
+8. Final result sent to user.
+
+---
+
+## 11. OPTIMIZER & STATISTICS
+
+- Optimizer = brain of Redshift.
+- Needs **up-to-date statistics** to create best plan.
+- Without statistics → wrong plan → slow queries (hours).
+- **Solution:** Run `ANALYZE` command to update statistics.
+
+---
+
+## 12. KEY TAKEAWAYS
+
+| Concept | Point |
+|---------|-------|
+| **Leader Node** | Coordinator, free, manages metadata |
+| **Compute Node** | Stores data, executes queries |
+| **Slice** | Processing unit inside compute node |
+| **SMP** | Single node, slow |
+| **MPP** | Multiple nodes, fast (if evenly distributed) |
+| **Skew** | Uneven data distribution → poor performance |
+| **Even distribution** | High performance |
+| **Optimizer** | Uses statistics to create best plan |
+| **Statistics** | Table size, unique rows, nulls, duplicates |
+| **ANALYZE** | Command to update statistics |
+
+---
+
+## 13. INTERVIEW TIPS
+
+- Explain **Leader Node**, **Compute Node**, **Slices** clearly.
+- Mention **MPP** and why it is faster than SMP.
+- Explain **Skew** and why it causes performance issues.
+- Explain **Optimizer** and importance of **statistics**.
+- Say: “Redshift is a **columnar, petabyte-scale, cloud data warehouse** built on **PostgreSQL**.”
+
+---
+
+✅ **REDSHIFT ARCHITECTURE, QUERY PROCESSING, SKEW – MUST-KNOW FOR INTERVIEWS.**
