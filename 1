@@ -1,0 +1,41 @@
+
+Data Lake = Raw, unstructured data storage (logs, files)       Example: AWS S3, ADLS (Azure Data Lake Storage)
+
+Data Warehouse = Structured, historical data for analytics      Example: AWS Redshift, Google BigQuery, Snowflake
+
+Data Lakehouse = Combines Data Lake + Data Warehouse features    Example: Databricks Delta Lake, AWS Lake Formation
+
+Fact Table = Contains numerical measures (sales, price)
+Dimension Table = Contains descriptive attributes (name, product)
+
+1. Star Schema: fact table surrounded by denormalized dimension tables; 
+involves LESS JOINs, 
+more redundancy
+
+2. Snowflake Schema: fact table surrounded by normalized dimension tables; 
+involves more joins and 
+less storage due to no redundancy.
+
+
+ETL = Extract → Transform → Load
+ELT = Extract → Load → Transform
+
+SCD Type 1 = Overwrite (no history)
+SCD Type 2 = Full history (new rows)
+SCD Type 3 = Limited history (new columns)
+
+Redshift = Cloud data warehouse (petabyte scale)
+COPY = Load data into Redshift
+UNLOAD = Export data from Redshift
+VACUUM = Re-sort and reclaim space
+ANALYZE = Update statistics
+Spectrum = Query S3 data directly
+
+1. 'Data Lake' हे रॉ (Raw) डेटाचे साठवणूक केंद्र आहे, तर 'Data Warehouse' हे विश्लेषणासाठी तयार केलेल्या स्ट्रक्चर्ड डेटाचे वेअरहाउस आहे.
+2. 'Fact Table' मध्ये मोजता येण्याजोग्या संख्यात्मक किमती (उदा. सेल्स, किंमत) असतात, तर 'Dimension Table' मध्ये वर्णनात्मक माहिती (उदा. नाव, ठिकाण) असते.
+3. 'Star Schema' हा सोपा आणि वेगवान डिझाइन पॅटर्न आहे, तर 'Snowflake Schema' हा अधिक नॉर्मलाईज्ड आणि गुंतागुंतीचा डिझाइन पॅटर्न आहे.
+4. 'ETL' प्रक्रियेत डेटा लोड करण्यापूर्वी ट्रान्सफॉर्म केला जातो, तर 'ELT' मध्ये तो वेअरहाउसमध्ये लोड केल्यानंतर ट्रान्सफॉर्म केला जातो.
+5. 'SCD Type 1' मध्ये जुना डेटा ओव्हरराईट होतो, 'Type 2' मध्ये नवीन ओळ (Row) तयार होऊन इतिहास साठवला जातो, आणि 'Type 3' मध्ये फक्त नवीन कॉलम तयार करून मर्यादित इतिहास ठेवला जातो.
+6. 'Redshift' हे क्लाउड डेटा वेअरहाउस आहे; 'COPY' आणि 'UNLOAD' डेटा हालचालीसाठी, तर 'VACUUM' आणि 'ANALYZE' हे परफॉर्मन्स ऑप्टिमायझेशनसाठी वापरले जातात.
+
+-------------------------------------------
