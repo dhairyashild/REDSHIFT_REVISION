@@ -1,0 +1,294 @@
+##########   VIDEO NOTES  AND BELOW ARE TRANSCRIPT NOTES FROM GPT
+
+
+             ---------          Redshift Complete Training Course [Part 4] | OLTP OLAP and Redshift Architecture |       ----------------
+
+
+-----------------------
+```
+# Distributed Architecture & Redshift Terminology
+- Distributed: Data should be distributed evenly to get the best out of distributed systems/architectures.
+
+## Redshift Architecture
+- Symmetric:
+  - SMP (Symmetric Multi-Processing): Tightly coupled, single-node system.
+- MPP (Massively Parallel Processing): Loosely coupled, multi-node system.
+- Centralized: SMP.
+- Distributed: Data should be distributed evenly to get the best out of distributed systems/architectures.
+
+## Redshift Terminology
+- Redshift: Is a petabyte-scale, columnar, cloud data warehouse.
+- AWS: Managed service.
+- Columnar:
+  - Compression: Encode/encoding.
+  - Statistics: Analyze - unique, duplicate, total, size.
+
+## Data Warehouse System Architecture Components
+- Leader Node:
+  - Stores metadata.
+  - Manages communications with client programs and compute nodes.
+  - Manages distributing data to the slices on compute nodes.
+  - Develops and distributes execution plans for compute nodes.
+- Compute Nodes:
+  - Execute query segments in parallel and send results back to the leader node for final aggregation.
+  - Each compute node has its own dedicated CPU, memory, and attached disk storage.
+  - User data is stored on the compute nodes.
+- Node Slices:
+  - Each slice is allocated a portion of the node's memory and disk space.
+  - Slices work in parallel to complete operations.
+  - The number of slices per node is determined by the node size of the cluster.
+  - Rows of a table are distributed to the node slices according to the distribution key.
+- Client Applications:
+  - Amazon Redshift is based on industry-standard PostgreSQL.
+
+```
+
+```
+Summary Notes:
+- The content outlines the architectural evolution and core components of Amazon Redshift, progressing from basic definitions to structural implementation.
+- Key concepts include the distinction between SMP (single-node, tightly coupled) and MPP (multi-node, loosely coupled) architectures.
+- The system relies on a Leader Node to handle orchestration and metadata, while Compute Nodes and Node Slices handle parallel data processing.
+- Efficient data management is driven by even data distribution, column-based storage (with compression/encoding), and regular statistical analysis to optimize query performance.
+
+```
+
+
+
+-----------------------------------------------------------------------------------
+
+# 📘 DATA WAREHOUSE DESIGN – COMPLETE NOTES
+
+
+## 3. REAL TIME DATA LOADING
+
+
+## 🔄 FLOW SUMMARY
+
+**1 LINE:** Source (OLTP) → Extract → Staging → Transform → Load → Target (Data Warehouse)
+
+## 📌 KEY POINTS
+
+| Step | Description |
+|------|-------------|
+| **Source** | OLTP systems – Banking, Insurance, Retail, Railway, ATM 
+       |
+| **Extract** | Pull data (Full or Incremental) 
+       |
+| **Staging** | Store raw data, clean, filter invalid records 
+       |
+| **Transform** | Apply logic, handle SCD Type 1/2/3 
+       |
+| **Load** | Insert/Update/Delete into target
+       |
+| **Target** | Data Warehouse – Redshift, Snowflake, Teradata, BigQuery |
+
+---
+
+## 4. STAGING LAYER
+
+- Staging is used for **cleaning** and **processing** data.
+- Invalid / failed records are removed before final load.
+- Example:
+  - Wrong PIN in ATM
+  - Invalid amount
+  - Failed transaction
+- Only valid records are loaded to target.
+
+---
+
+## 5. SCD – SLOWLY CHANGING DIMENSIONS
+
+- SCD means **Slowly Changing Dimensions**.
+- Dimension data changes over time.
+- Example:
+  - Employee designation
+  - Salary
+  - Department
+  - Manager
+  - Location
+- Main SCD types:
+  - **Type 1**
+  - **Type 2**
+  - **Type 3**
+
+---
+
+## 6. SCD TYPE 1
+
+- Keeps only **current/latest data**.
+- Old data is overwritten.
+- Used when history is not needed.
+- Example:
+  - Current salary
+  - Current designation
+  - Current department
+- For full extract:
+  - Delete old data
+  - Load new file
+- For incremental extract:
+  - Update changed records
+  - Insert new records
+- Final target table always shows **latest state**.
+
+### Example
+- Employee joined as Associate Engineer.
+- Later promoted to System Engineer.
+- In Type 1 table, only **System Engineer** is kept.
+
+---
+
+## 7. SCD TYPE 2
+
+- Keeps **full history**.
+- New row is inserted whenever data changes.
+- Used when complete history is needed.
+- Most important SCD type in interviews.
+
+### Common columns added in Type 2
+- Start date
+- End date
+
+### Important points
+- These columns are **not from source**.
+- They are added during loading.
+- First record:
+  - Start date = joining date
+  - End date = high date
+- High date usually = **9999-12-31**
+- High date means record is **active/current**.
+
+### Example
+- Employee works as SE from Jan 1 to Mar 31.
+- Then becomes Architect from Apr 1.
+- Then becomes BI Engineer later.
+- Type 2 table will keep **all records** with date ranges.
+- So full employee history is available.
+
+### Active record check
+- If end date = **9999-12-31**, record is active.
+
+---
+
+## 8. SCD TYPE 3
+
+- Keeps **current data + recent history**.
+- Used for limited history only.
+- Example:
+  - Last 30 days
+  - Last 60 days
+  - Last 90 days
+- Common in customer support use cases.
+- If transaction is older than the stored window, support team may not see it.
+
+### Important clarification
+- In Type 3, we are deleting **old transactions**, not the employee/customer itself.
+- The person is still active.
+- Only old transaction history is removed from the table.
+
+---
+
+## 9. TYPE 2 IMPLEMENTATION METHODS
+
+- **Date range method**
+- **Flag method**
+- **Version method**
+
+### Most used
+- Date range method is the most common and preferred one.
+
+### Date range method
+- Add:
+  - Start date
+  - End date
+- Current record:
+  - End date = 9999-12-31
+- When change comes:
+  - Close old row by updating end date
+  - Insert new row with new start date and high end date
+
+### Flag method
+- Add a flag column.
+- Current record = 1
+- Old record = 0
+
+### Version method
+- Add version column.
+- First record = V1
+- Next change = V2
+- Next change = V3
+
+### Note
+- Version and flag are less used now.
+- Start date + end date is the standard approach.
+
+---
+
+## 10. FACT TABLE NOTE
+
+- SCD Type 1, 2, 3 is mainly for **dimension tables**.
+- Fact tables store **measures / transactions**.
+- Fact tables usually load with all transaction data.
+- Fact tables join with dimensions for reporting.
+- Example:
+  - Sales fact + customer dimension + product dimension + date dimension
+- By joining with date dimension, we get:
+  - Daily sales
+  - Weekly sales
+  - Monthly sales
+  - Quarterly sales
+  - Yearly sales
+
+---
+
+## 11. IMPORTANT SQL IDEA
+
+- Find records in stage that are **not present** in target.
+- Insert new records.
+- Update matching records if values changed.
+- Final table should always be correct and current.
+
+### Basic logic
+- **Insert** new rows.
+- **Update** existing rows.
+- Keep history only where business needs it.
+
+---
+
+## 12. INTERVIEW FOCUS POINTS
+
+- What is fact table?
+- What is dimension table?
+- What is star schema?
+- What is snowflake schema?
+- What is SCD?
+- What is SCD Type 1, 2, 3?
+- How do you identify active records in Type 2?
+- What is high date?
+- How do you implement Type 2 using SQL?
+- What is the difference between join and left join?
+
+---
+
+## 13. VERY SHORT MEMORY LINES
+
+- **Star = simple, fewer joins**
+- **Snowflake = normalized, more joins**
+- **Type 1 = overwrite**
+- **Type 2 = full history**
+- **Type 3 = recent history**
+- **9999-12-31 = active record**
+- **SCD is for dimensions, not fact tables**
+
+---
+
+## 14. ONE IMPORTANT CORRECTION
+
+- In Type 3 examples, the **transaction history** is limited.
+- It does **not** mean the employee/customer record is deleted.
+- Only the available history in that table is limited.
+
+---
+
+## 15. FINAL LINE
+
+- In data warehouse interviews, always explain design based on **business need**, not as one schema being better than the other.
