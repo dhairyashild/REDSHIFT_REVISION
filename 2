@@ -1,0 +1,94 @@
+# ================================================================
+# REDSHIFT TRAINING NOTES - SESSION 1
+# ================================================================
+
+# ================================================================
+# 1. CLOUD VS ON-PREMISES
+# ================================================================
+
+ON-PREMISES:
+- Servers in customer premises
+- Buy hardware, cables, setup network
+- Need system/network administrators
+- Hardware outdated in 4-5 years
+- Continuous patching/upgrading
+- High cost + lots of planning
+
+CLOUD (AWS/Azure/GCP):
+- Data centers maintained by provider
+- Pay only what you use (like electricity bill)
+- No initial investment
+- 2 minutes setup time
+- Auto-scaling
+- No maintenance headache
+- 90% cost reduction
+- 10x faster than on-premises
+
+BILLING EXAMPLE:
+- Use cluster = get bill
+- Pause cluster = no bill
+- Even $1 for 6 hours usage
+
+# ================================================================
+# 2. WHY COMPANIES MOVE TO CLOUD?
+# ================================================================
+
+- 90% cost saving (pay 10% of on-premises cost)
+- No hardware/software upgrades
+- No network/security overhead
+- Always available
+- Focus only on business
+- Competitors forcing lower prices
+
+COMPETITION EXAMPLE:
+- Jio came → reduced data rates → others reduced
+- AWS came → reduced cloud costs → Azure/Google reduced
+
+# ================================================================
+# 3. WHAT IS DATABASE?
+# ================================================================
+
+DATABASE = Collection of data stored in tables (rows + columns)
+
+DATABASE OBJECTS:
+- Tables, Views, Stored Procedures
+- Triggers, Users, Databases
+
+RDBMS = Relational Database Management System
+- Tables related via Primary Key and Foreign Key
+- Examples: Oracle, PostgreSQL, MySQL, SQL Server
+
+# ================================================================
+# 4. PRIMARY KEY
+# ================================================================
+
+DEFINITION:
+- Column that uniquely identifies each record in a table
+- Must be UNIQUE
+- Must be NOT NULL
+
+INTERVIEW QUESTION:
+Q: Can I insert 1,2,3,4,1,2 in primary key column?
+A: No (duplicate values not allowed)
+
+Q: Can I insert 1,2,3,4,NULL?
+A: No (NULL not allowed)
+
+# ================================================================
+# 5. FOREIGN KEY
+# ================================================================
+
+DEFINITION:
+- Primary key of one table when used in another table
+- Creates relationship between tables
+
+SIMPLE UNDERSTANDING:
+- US citizen in India = foreigner
+- Primary key column in another table = foreign key
+
+FOREIGN KEY PROPERTIES:
+- Can have duplicate values
+- Can have NULL values
+- No uniqueness required
+
+# ================================================================
