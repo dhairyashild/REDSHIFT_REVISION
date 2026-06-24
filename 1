@@ -20,6 +20,13 @@ less storage due to no redundancy.
 ETL = Extract → Transform → Load
 ELT = Extract → Load → Transform
 
+
+SCD – Slowly Changing Dimensions (Full Form)
+
+Definition: SCD refers to dimension tables that change slowly over time 
+(e.g., customer name, address, product price). 
+SCD types (Type 1, Type 2, Type 3) define how to handle historical changes when loading data into a data warehouse.
+
 SCD Type 1 = Overwrite (no history)
 SCD Type 2 = Full history (new rows)
 SCD Type 3 = Limited history (new columns)
